@@ -52,9 +52,14 @@ namespace FIAP_Cloud_Games.Application.Services
             return jogo;
         }
 
-        public Task<bool> Removejogo(int id)
+        public async Task<bool> Removejogo(int id)
         {
-            throw new NotImplementedException();
+           return await _jogoRepo.DeleteAsync(id);
+        }
+
+        public async Task<Jogo> Atualizarjogo(Jogo  jogo)
+        {
+            return await _jogoRepo.AtualizaJogo(jogo);
         }
     }
 }

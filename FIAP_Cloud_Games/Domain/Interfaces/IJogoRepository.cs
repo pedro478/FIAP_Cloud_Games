@@ -11,5 +11,7 @@ namespace FIAP_Cloud_Games.Domain.Interfaces
         Task<bool> RegistrarCompraAsync(int idUsuario, int idJogo);
         Task<bool> UsuarioJaPossuiJogoAsync(int idUsuario, int idJogo);
 
+        Task<Jogo> AtualizaJogo(Jogo jogo);
+
     }
 }

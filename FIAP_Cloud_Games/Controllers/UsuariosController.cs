@@ -80,7 +80,17 @@ namespace FIAP_Cloud_Games.Controllers
                 if (id > 0)
                 {
                     var usuario = await _usuarioService.GetUsuarioById(id);
-                    return Ok(usuario);
+
+                    UsuarioReadDTO userReturn = new UsuarioReadDTO
+                    {
+                        email = usuario.email,
+                        nome = usuario.Nome,
+                        tipoAcesso = usuario.tipoAcesso,
+                        jogosComprados = usuario.Jogos
+
+                    };
+
+                    return Ok(userReturn);
 
                 }
                 return BadRequest("Id inválido!");
@@ -111,7 +121,20 @@ namespace FIAP_Cloud_Games.Controllers
                 var novoUsuario = await _usuarioService.CriarUsuario(usuario);
 
                 if (novoUsuario == null) return BadRequest("Falha ao criar usuario!");
-                else return Ok(novoUsuario);
+                else
+                {
+                    UsuarioReadDTO userReturn = new UsuarioReadDTO
+                    {
+                        email = novoUsuario.email,
+                        nome = novoUsuario.Nome,
+                        tipoAcesso = novoUsuario.tipoAcesso,
+                        jogosComprados = novoUsuario.Jogos ?? new List<Jogo>()
+
+                    };
+
+
+                    return Ok(userReturn);
+                }
             }
             catch (Exception ex)
             {
@@ -145,7 +168,17 @@ namespace FIAP_Cloud_Games.Controllers
                 if (result.IdUsuario == 0) return BadRequest("Falha ao atualizar dados do usuario");
 
 
-                return Ok(result);
+                UsuarioReadDTO userReturn = new UsuarioReadDTO
+                {
+                    email = result.email,
+                    nome = result.Nome,
+                    tipoAcesso = result.tipoAcesso,
+                    jogosComprados = result.Jogos ?? new List<Jogo>()
+
+                };
+
+
+                return Ok(userReturn);
 
             }
             catch (Exception ex)

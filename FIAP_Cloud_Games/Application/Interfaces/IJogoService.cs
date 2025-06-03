@@ -12,6 +12,8 @@ namespace FIAP_Cloud_Games.Application.Interfaces
 
         Task<Jogo> ComprarJogo(ComprarJogoDTO comprarJogoDTO);
 
+        Task<Jogo> Atualizarjogo(Jogo jogo);
+
      
     }
 }

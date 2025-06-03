@@ -88,6 +88,8 @@ namespace FIAP_Cloud_Games.Controllers
                 _jogo.Descricao = jogo.Descricao;
                 _jogo.Disponivel = jogo.Disponivel;
 
+                var result = await _service.Atualizarjogo(_jogo);
+
                 return Ok(jogo);
             }
             catch (Exception ex)
@@ -101,7 +103,7 @@ namespace FIAP_Cloud_Games.Controllers
         }
 
 
-        [HttpDelete("Deletar/{id}")]
+        [HttpDelete("Deletar")]
         [Authorize]
         public async Task<IActionResult> Remover(int id)
         {

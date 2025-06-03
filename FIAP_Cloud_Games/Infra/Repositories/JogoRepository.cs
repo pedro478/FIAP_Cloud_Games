@@ -59,6 +59,13 @@ namespace FIAP_Cloud_Games.Infra.Repositories
             _context.JogosUsuarios.Add(compra);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Jogo> AtualizaJogo(Jogo jogo)
+        {
+            _context.Update(jogo);
+            await _context.SaveChangesAsync();
+            return jogo;
+        }
     }
 
 
