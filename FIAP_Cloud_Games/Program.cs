@@ -26,6 +26,8 @@ builder.Services.AddCorrelationIdGenerator();
 builder.Services.AddTransient(typeof(BaseLogger<>));
 
 
+
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite(connectionString));
 
@@ -90,6 +92,15 @@ builder.Services.AddControllers();
 
 
 var app = builder.Build();
+
+//realiza o primeiro migration do banco
+using (var scope =  app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    db.Database.Migrate();
+
+}
 
 //função inicial para criar um usuario default
 await SeedInicial.SeedDefaultUserAsync(app.Services);
