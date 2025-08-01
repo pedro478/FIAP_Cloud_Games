@@ -32,4 +32,4 @@ jobs:
           docker build -t sua-api .
           docker stop sua-api || true
           docker rm sua-api || true
-          docker run -d -p 80:80 --name sua-api sua-api
+          docker run -d -p 80:5000 --name sua-api sua-api
