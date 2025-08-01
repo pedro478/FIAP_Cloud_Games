@@ -13,20 +13,24 @@ using Microsoft.OpenApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    WebRootPath = "wwwroot",
+    ApplicationName = System.Reflection.Assembly.GetExecutingAssembly().FullName,
+    EnvironmentName = Environments.Production
+});
 
-var builder = WebApplication.CreateBuilder(args);
+// Adiciona configura√ß√£o para escutar em todas as interfaces na porta 5000
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
-// Add services to the container.
-
+// Configura servi√ßos
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
 builder.Services.AddCorrelationIdGenerator();
 builder.Services.AddTransient(typeof(BaseLogger<>));
-
-
-
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite(connectionString));
@@ -35,10 +39,8 @@ builder.Services.AddTransient<tokenService>();
 
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
-
 builder.Services.AddScoped<IJogoRepository, JogoRepository>();
 builder.Services.AddScoped<IJogoService, JogoService>();
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -53,12 +55,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ConfiguraÁ„o do Swagger para aceitar Bearer Token
 builder.Services.AddSwaggerGen(c =>
 {
-
     c.SchemaFilter<EnumSchemaFilter>();
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "FIAP Cloud Games API", Version = "v1" });
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Insira o token JWT no formato: Bearer {seu_token_aqui}",
@@ -84,35 +85,27 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
-
-
 var app = builder.Build();
 
-//realiza o primeiro migration do banco
-using (var scope =  app.Services.CreateScope())
+// Aplica migra√ß√µes
+using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
     db.Database.Migrate();
-
 }
 
-//funÁ„o inicial para criar um usuario default
+// Cria usu√°rio default
 await SeedInicial.SeedDefaultUserAsync(app.Services);
-
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-   
-
-
-app.UseHttpsRedirection();
+// REMOVE HTTPS redirection porque estamos rodando apenas com HTTP no Docker
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
