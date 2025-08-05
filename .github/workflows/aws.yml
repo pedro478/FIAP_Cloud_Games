@@ -22,7 +22,7 @@ jobs:
     # Build e push da imagem para o Docker Hub
     - name: Build e push da imagem Docker
       env:
-        IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/sua-api
+        IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/FCG-API
       run: |
         docker build -t $IMAGE_NAME:latest .
         docker push $IMAGE_NAME:latest
@@ -35,7 +35,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sua-api:latest
-          docker stop sua-api || true
-          docker rm sua-api || true
-          docker run -d -p 80:5000 --name sua-api ${{ secrets.DOCKERHUB_USERNAME }}/sua-api:latest
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/FCG-API:latest
+          docker stop FCG-API || true
+          docker rm FCG-API || true
+          docker run -d -p 80:5000 --name sua-api ${{ secrets.DOCKERHUB_USERNAME }}/FCG-API:latest
