@@ -12,15 +12,22 @@ jobs:
     - name: Checkout do código
       uses: actions/checkout@v3
 
-    - name: Copiar arquivos para a EC2 via SCP
-      uses: appleboy/scp-action@v0.1.7
+    # Login no Docker Hub
+    - name: Login no Docker Hub
+      uses: docker/login-action@v3
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        source: "."
-        target: "/home/${{ secrets.EC2_USER }}/app"
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    # Build e push da imagem para o Docker Hub
+    - name: Build e push da imagem Docker
+      env:
+        IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/sua-api
+      run: |
+        docker build -t $IMAGE_NAME:latest .
+        docker push $IMAGE_NAME:latest
+
+    # Conectar e rodar a imagem direto do Docker Hub
     - name: Conectar e rodar comandos na EC2 via SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -28,8 +35,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
-          cd ~/app
-          docker build -t sua-api .
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sua-api:latest
           docker stop sua-api || true
           docker rm sua-api || true
-          docker run -d -p 80:5000 --name sua-api sua-api
+          docker run -d -p 80:5000 --name sua-api ${{ secrets.DOCKERHUB_USERNAME }}/sua-api:latest
